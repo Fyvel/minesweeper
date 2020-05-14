@@ -1,12 +1,14 @@
 module.exports = {
 	'env': {
 		'browser': true,
-		'es6': true
+		'es6': true,
+		'node': true,
 	},
 	'extends': [
 		'eslint:recommended',
 		'plugin:react/recommended',
-		'plugin:@typescript-eslint/eslint-recommended'
+		'plugin:@typescript-eslint/eslint-recommended',
+		'plugin:@typescript-eslint/recommended'
 	],
 	'globals': {
 		'Atomics': 'readonly',
@@ -25,9 +27,30 @@ module.exports = {
 		'@typescript-eslint'
 	],
 	'rules': {
+		'@typescript-eslint/explicit-function-return-type': 'off',
+		'@typescript-eslint/no-use-before-define': [
+			'error',
+			{
+				'functions': false
+			}],
+		'@typescript-eslint/member-delimiter-style': [
+			'error',
+			{
+				'multiline': {
+					'delimiter': 'comma',
+					'requireLast': true
+				},
+				'singleline': {
+					'delimiter': 'comma',
+					'requireLast': false
+				},
+			}],
 		'indent': [
 			'error',
-			'tab'
+			'tab',
+			{
+				'SwitchCase': 1
+			}
 		],
 		'linebreak-style': [
 			'error',
@@ -40,6 +63,6 @@ module.exports = {
 		'semi': [
 			'error',
 			'never'
-		]
+		],
 	}
 }

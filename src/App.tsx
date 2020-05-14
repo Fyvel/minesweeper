@@ -1,21 +1,21 @@
 import React from 'react'
-import { Provider, connect } from 'react-redux';
+import { Provider, connect } from 'react-redux'
 import * as  Minesweeper from './minesweeper-game'
 import MinesweeperStore from './redux/minesweeper-store'
 import { MinesweeperActions } from './redux/minesweeper-actions'
-import { Dispatch, Action, bindActionCreators } from 'redux';
-import styles from './App.module.scss'
+import { Dispatch, Action, bindActionCreators } from 'redux'
+// import styles from './App.module.scss'
 
 
-const DEFAULT_OPTIONS = {
-	mineCount: 10,
-	width: 10,
-	height: 10,
-};
+// const DEFAULT_OPTIONS = {
+// 	mineCount: 10,
+// 	width: 10,
+// 	height: 10,
+// }
 
 type StateProps = Minesweeper.Game & {
-	grid: string[][]
-};
+	grid: string[][],
+}
 
 const mapStateToProps = (state: Minesweeper.Game): StateProps => {
 	const { width, height } = state
@@ -28,7 +28,7 @@ const mapStateToProps = (state: Minesweeper.Game): StateProps => {
 	}
 
 	return { ...state, grid }
-};
+}
 
 type DispatchProps = {
 	flagLocation: typeof MinesweeperActions.flagLocation,
@@ -47,7 +47,7 @@ type Props = StateProps & DispatchProps;
 // The <App /> component's `Props` are the
 // intersection of the props available after we
 // `connect` the component
-connect(mapStateToProps, mapDispatchToProps)(App);
+connect(mapStateToProps, mapDispatchToProps)(App)
 
 export default function App() {
 	return (

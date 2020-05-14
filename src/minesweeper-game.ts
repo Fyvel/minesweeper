@@ -1,36 +1,34 @@
-export enum CellStatus {
-	Unknown = 0,
-	Revealed,
-	Flagged,
-	Exploded,
-}
+export type GameStatus = 'Started' | 'Won' | 'Lost'
+export type CellStatus = 'Unknown' | 'Revealed' | 'Flagged' | 'Exploded'
 
 export type Cell = {
-	status: CellStatus
-	revealedCount: number
+	status: CellStatus,
+	revealedCount: number,
 }
-
-export type Options = {
-	mineCount: number
-	width: number
-	height: number
-}
-
 type Board = {
-	cellsByXy: { [xy: string]: Cell }
-	neighborsByXy: { [xy: string]: string[] }
-	minesByXy: { [xy: string]: true }
+	cellsByXy: { [xy: string]: Cell },
+	neighborsByXy: { [xy: string]: string[] },
+	minesByXy: { [xy: string]: true },
 }
-
-export enum GameStatus {
-	Started = 0,
-	Won,
-	Lost,
+export type Options = {
+	mineCount: number,
+	width: number,
+	height: number,
 }
-
 export type Game = Options & Board & {
-	status: GameStatus
-	moveCount: number
+	status: GameStatus,
+	moveCount: number,
+}
+
+type MinesweeperAPI = {
+	create(options: Options): Game,
+	reveal(prev: Game, xy: string): Game,
+	flag(prev: Game, xy: string): Game,
+}
+export const Gameplay: MinesweeperAPI = {
+	create,
+	reveal,
+	flag,
 }
 
 const NEIGHBORS = Object.freeze([
@@ -62,7 +60,7 @@ function createBoard(options: Options): Board {
 			const xy = [x, y].toString()
 			board.cellsByXy[xy] = {
 				revealedCount: -1,
-				status: CellStatus.Unknown,
+				status: 'Unknown',
 			}
 			board.neighborsByXy[xy] = neighborXys(options, x, y)
 		}
@@ -77,15 +75,16 @@ function createBoard(options: Options): Board {
 	return board
 }
 
-const replaceCell = (game: Game, xy: string, cell: Cell): Game => ({
-	...game,
-	cellsByXy: { ...game.cellsByXy, [xy]: cell },
-})
+const replaceCell = (game: Game, xy: string, cell: Cell): Game =>
+	({
+		...game,
+		cellsByXy: { ...game.cellsByXy, [xy]: cell },
+	})
 
 const isCellKnown = ({ status }: Cell) =>
-	(status === CellStatus.Revealed || status === CellStatus.Exploded)
+	(status === 'Revealed' || status === 'Exploded')
 
-function isVictorious(game: Game) {
+const isVictorious = (game: Game) => {
 	const unknownCells = Object.keys(game.cellsByXy)
 		.filter((xy) => !isCellKnown(game.cellsByXy[xy]))
 	return (unknownCells.length === game.mineCount)
@@ -96,76 +95,67 @@ const countMines = (game: Game, xys: string[]) =>
 		return game.minesByXy[xy] ? count + 1 : count
 	}, 0)
 
-const testLocations = (prev: Game, xys: string[]): Game =>
-	xys.reduce((game, xy) => {
-		const cell = game.cellsByXy[xy]
-		if (cell && cell.status === CellStatus.Unknown) {
-			return testLocation(game, xy)
-		}
-		return game
-	}, prev)
-
-function testLocation(game: Game, xy: string): Game {
+const testLocation = (game: Game, xy: string): Game => {
 	const cell = game.cellsByXy[xy]
-	if (cell.status === CellStatus.Revealed) {
+	if (cell.status === 'Revealed') {
 		return game
 	} else if (game.minesByXy[xy]) {
 		return {
-			...replaceCell(game, xy, { ...cell, status: CellStatus.Exploded }),
-			status: GameStatus.Lost,
+			...replaceCell(game, xy, { ...cell, status: 'Exploded' }),
+			status: 'Lost',
 		}
 	} else {
 		const neighbors = game.neighborsByXy[xy]
 		const revealedCount = countMines(game, neighbors)
 		const nextGame = replaceCell(game, xy, {
-			status: CellStatus.Revealed,
+			status: 'Revealed',
 			revealedCount,
 		})
 
 		if (isVictorious(nextGame)) {
-			return { ...nextGame, status: GameStatus.Won }
+			return { ...nextGame, status: 'Won' }
 		} else if (revealedCount === 0) {
 			return testLocations(nextGame, neighbors)
 		}
-
 		return nextGame
 	}
 }
 
-const create = (options: Options): Game => ({
-	...options,
-	...createBoard(options),
-	status: GameStatus.Started,
-	moveCount: 0,
-})
+function testLocations(prev: Game, xys: string[]): Game {
+	return xys.reduce((game, xy) => {
+		const cell = game.cellsByXy[xy]
+		if (cell && cell.status === 'Unknown')
+			return testLocation(game, xy)
+		return game
+	}, prev)
+}
 
-const reveal = (game: Game, xy: string): Game => ({
-	...testLocation(game, xy),
-	moveCount: game.moveCount + 1,
-})
+function create(options: Options): Game {
+	return {
+		...options,
+		...createBoard(options),
+		status: 'Started',
+		moveCount: 0,
+	}
+}
+
+function reveal(game: Game, xy: string): Game {
+	return {
+		...testLocation(game, xy),
+		moveCount: game.moveCount + 1,
+	}
+}
 
 function flag(game: Game, xy: string): Game {
 	const cell = game.cellsByXy[xy]
-	if (cell.status === CellStatus.Unknown) {
-		return replaceCell(game, xy, { ...cell, status: CellStatus.Flagged })
-	} else if (cell.status === CellStatus.Flagged) {
-		return replaceCell(game, xy, { ...cell, status: CellStatus.Unknown })
-	} else if (cell.status === CellStatus.Revealed) {
+	if (cell.status === 'Unknown') {
+		return replaceCell(game, xy, { ...cell, status: 'Flagged' })
+	} else if (cell.status === 'Flagged') {
+		return replaceCell(game, xy, { ...cell, status: 'Unknown' })
+	} else if (cell.status === 'Revealed') {
 		const unknownNeighbors = game.neighborsByXy[xy].filter(nxy =>
-			game.cellsByXy[nxy].status === CellStatus.Unknown)
+			game.cellsByXy[nxy].status === 'Unknown')
 		return testLocations(game, unknownNeighbors)
 	}
 	return game
-}
-
-type MinesweeperAPI = {
-	create(options: Options): Game
-	reveal(prev: Game, xy: string): Game
-	flag(prev: Game, xy: string): Game
-}
-
-export const Minesweeper: MinesweeperAPI = {
-	create,
-	reveal,
-	flag,
 }
