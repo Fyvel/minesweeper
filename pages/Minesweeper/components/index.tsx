@@ -44,6 +44,9 @@ export const Button = styled.button`
 ` 
 
 export const Grid = styled.div<{ disabled: boolean }>`
+	overflow: auto;
+	max-width: 100vw;
+	max-height: 70vh;
 	background-color: lightgray;
 	display: flex;
 	flex-flow: column nowrap;
@@ -60,8 +63,8 @@ export const Row = styled.div`
 
 export const Area = styled.button<{ isVisible: boolean }>`
     font-family: 'Common Pixel', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
-    height: 48px;
-    width: 48px;
+    min-height: 10vw;
+    min-width: 10vw;
 	font-size: 1.3em;
 	font-weight: bold;
     border:${p => p.isVisible ? '.1px dashed' : '1.5px solid'};
