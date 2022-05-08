@@ -2,8 +2,8 @@ html,
 body {
     padding: 0;
     margin: 0;
-    font-family: -apple-system, Fira Sans, Helvetica Neue, sans-serif;
-}
+    font-family: 'Common Pixel', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
+}                                                
 
 a {
     color: inherit;

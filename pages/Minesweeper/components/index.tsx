@@ -6,14 +6,28 @@ type LevelSelectorProps = {
 };
 export default function LevelSelector({ onSelect }: LevelSelectorProps) {
 	return (
-		<Row>
-			<button onClick={() => onSelect(GameLevel.Easy)}>Easy</button>
-			<button onClick={() => onSelect(GameLevel.Medium)}>Medium</button>
-			<button onClick={() => onSelect(GameLevel.Hard)}>Hard</button>
-			<button onClick={() => onSelect(GameLevel.Impossible)}>Impossible</button>
-		</Row>
+		<LevelRow>
+			<LevelButton onClick={() => onSelect(GameLevel.Easy)}>Easy</LevelButton>
+			<LevelButton onClick={() => onSelect(GameLevel.Medium)}>Medium</LevelButton>
+			<LevelButton onClick={() => onSelect(GameLevel.Hard)}>Hard</LevelButton>
+			<LevelButton onClick={() => onSelect(GameLevel.Impossible)}>Impossible</LevelButton>
+		</LevelRow>
 	);
 }
+
+const LevelRow = styled.div`
+	width: 100%;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	gap: 20px;
+`;
+
+const LevelButton = styled.button`
+    font-family: 'Common Pixel', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
+	background-color: #dab73b;
+	min-height:48px;
+	text-transform: uppercase;
+`
 
 export const TopBar = styled.div`
 	width: 100%;
@@ -22,6 +36,12 @@ export const TopBar = styled.div`
 	align-items: center;
 	justify-items: center;
 `
+
+export const Button = styled.button`
+	min-height:48px;
+	min-width:48px;
+	font-size: 1.3em;
+` 
 
 export const Grid = styled.div<{ disabled: boolean }>`
 	background-color: lightgray;
@@ -39,8 +59,11 @@ export const Row = styled.div`
 `
 
 export const Area = styled.button<{ isVisible: boolean }>`
-    height: 20px;
-    width: 20px;
+    font-family: 'Common Pixel', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
+    height: 48px;
+    width: 48px;
+	font-size: 1.3em;
+	font-weight: bold;
     border:${p => p.isVisible ? '.1px dashed' : '1.5px solid'};
     background-color: ${p => p.isVisible ? '#c0c0c0c3' : '#C0C0C0'};
     border-top-color: ${p => p.isVisible ? '#7B7B7B' : '#ffffff'};

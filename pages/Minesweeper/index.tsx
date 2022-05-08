@@ -1,7 +1,7 @@
 import { MinesweeperState } from 'games/MinesweeperGame'
 import MinesweeperProvider, { useMinesweeperHook } from 'context/MinesweeperProvider'
 import { formatTime } from '@/utils/formatTime'
-import LevelSelector, { Area, Grid, Row, TopBar } from './components'
+import LevelSelector, { Area, Button, Grid, Row, TopBar } from './components'
 
 export default function Minesweeper() {
 	const { state, timer, actions } = useMinesweeperHook()
@@ -17,7 +17,7 @@ export default function Minesweeper() {
 		<MinesweeperProvider>
 			<TopBar>
 				{state.minesCount}
-				<button onClick={() => actions.newGame(state.level)}>{getFace(state.endGame)}</button>
+				<Button onClick={() => actions.newGame(state.level)}>{getFace(state.endGame)}</Button>
 				{formatTime(timer.value)}
 			</TopBar>
 			<Grid disabled={!!state.endedOn}>
@@ -26,6 +26,7 @@ export default function Minesweeper() {
 						{row.map(({ isVisible, isFlagged, value }, yIndex) => (
 							<Area
 								key={`${xIndex}_${yIndex}`}
+								aria-label="minefield area"
 								onClick={(e) => {
 									e.preventDefault()
 									onClickCell(xIndex, yIndex)
