@@ -7,10 +7,10 @@ type Action =
 	| ActionBase<'FLAG_AREA', { payload: AreaType }>
 
 export enum GameLevel {
-	Easy,
-	Medium,
-	Hard,
-	Impossible,
+	Easy = 'Easy',
+	Medium = 'Medium',
+	Hard = 'Hard',
+	Impossible = 'Impossible',
 }
 
 export type MinesweeperState = {
@@ -39,8 +39,8 @@ export type MinesweeperActions = {
 export const nbOfMines = {
 	[GameLevel.Easy]: 10,
 	[GameLevel.Medium]: 40,
-	[GameLevel.Hard]: 160,
-	[GameLevel.Impossible]: 2000,
+	[GameLevel.Hard]: 80,
+	[GameLevel.Impossible]: 250,
 }
 
 export default function MinesweeperReducer(state: MinesweeperState, action: Action): MinesweeperState {
@@ -110,7 +110,6 @@ export default function MinesweeperReducer(state: MinesweeperState, action: Acti
 				}
 
 				const remainingAreas = _getRemainingAreas(newBoard, state.minefield)
-				console.log(" LOG:  >  revealArea  >  remainingAreas", remainingAreas)
 				if (!remainingAreas.length) {
 					return {
 						...current,
@@ -152,9 +151,9 @@ const _createGrid = (level: GameLevel): boolean[][] => {
 		case GameLevel.Medium:
 			return Array(16).fill(Array(16).fill(false))
 		case GameLevel.Hard:
-			return Array(30).fill(Array(30).fill(false))
+			return Array(24).fill(Array(24).fill(false))
 		case GameLevel.Impossible:
-			return Array(50).fill(Array(50).fill(false))
+			return Array(32).fill(Array(32).fill(false))
 		default:
 			throw new Error('Unknown level selected')
 	}

@@ -1,11 +1,21 @@
-html,
-body {
-	width: 100vw;
+html {
+	scroll-behavior: smooth;
+	max-width: 100vw;
 	height: 100%;
-    padding: 0;
-    margin: 0;
-    font-family: 'Common Pixel', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
-}                                                
+}
+::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+body {
+	display: grid;
+	grid-template-rows: 1fr auto;
+	margin: 0;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-family: 'Common Pixel', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
+}                                             
 
 a {
     color: inherit;
@@ -14,4 +24,22 @@ a {
 
 * {
     box-sizing: border-box;
+}
+
+.footer {
+    font-family: -apple-system, Fira Sans, Helvetica Neue, sans-serif;
+	grid-row-start: 2;
+	grid-row-end: 3;
+    width: 100%;
+    height: 60px;
+    border-top: 1px solid #eaeaea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
