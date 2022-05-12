@@ -1,3 +1,3 @@
 ## Minesweeper
 
-Free to play here [Demo](https://minesweeper-beta-ten.vercel.app/)
+The fun happens <a href="https://minesweeper-beta-ten.vercel.app/" target="_blank">here</a>

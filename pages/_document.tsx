@@ -20,7 +20,7 @@ class MyDocument extends Document {
 						<NextScript />
 					</div>
 					<footer className="footer">
-						<a href="https://github.com/Fyvel" target="_blank" rel="noopener noreferrer">
+						<a href="https://github.com/Fyvel/minesweeper" target="_blank" rel="noopener noreferrer">
 							Made with ❤️ by Fyvel
 						</a>
 					</footer>
