@@ -25,7 +25,7 @@ export const LevelRow = styled.div`
 
 export const LevelButton = styled.button<{ isActive: boolean }>`
 	flex: 0 0 100px;
-    font-family: 'Common Pixel', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
+    font-family: 'Press Start 2P', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
 	background-color: ${p => p.isActive ? '#958036' : '#dab73b'};
 	color: ${p => p.isActive ? 'white' : '#333'};
 	min-height: 48px;
@@ -72,7 +72,7 @@ const areaSize = {
 	[GameLevel.Impossible]: { width: '3.08vw', height: '3.08vw', fontSize: '1em' },
 }
 export const Area = styled.button<{ isVisible: boolean, level: GameLevel }>`
-    font-family: 'Common Pixel', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
+    font-family: 'Press Start 2P', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
 	font-size:  ${p => areaSize[p.level].fontSize};
 	height: ${p => areaSize[p.level].height};
 	width: ${p => areaSize[p.level].width};

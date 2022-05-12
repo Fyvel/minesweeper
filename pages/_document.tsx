@@ -1,4 +1,6 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
+import Footer from "./Footer";
+import Header from "./Header";
 
 class MyDocument extends Document {
 	render() {
@@ -12,17 +14,20 @@ class MyDocument extends Document {
 					<link rel="manifest" href="/manifest.webmanifest" />
 					<link rel="apple-touch-icon" href="/icon.png"></link>
 					<meta name="theme-color" content="#fff" />
-					<link href="http://fonts.cdnfonts.com/css/common-pixel" rel="stylesheet" />
+					<link rel="preconnect" href="https://fonts.googleapis.com" />
+					<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin='true' />
+					<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
 				</Head>
 				<body>
-					<div className="content">
+					<header className="header">
+						<Header />
+					</header>
+					<main className="main">
 						<Main />
 						<NextScript />
-					</div>
+					</main>
 					<footer className="footer">
-						<a href="https://github.com/Fyvel/minesweeper" target="_blank" rel="noopener noreferrer">
-							Made with ❤️ by Fyvel
-						</a>
+						<Footer />
 					</footer>
 				</body>
 			</Html>
@@ -31,3 +36,4 @@ class MyDocument extends Document {
 }
 
 export default MyDocument;
+
