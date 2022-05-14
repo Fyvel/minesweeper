@@ -15,11 +15,13 @@ export default function Minesweeper() {
 		actions.flagArea({ x: xIndex, y: yIndex })
 	}
 
-	useEffect(()=>{
-		if(state.endGame === 'WIN'|| state.endGame === 'LOSE'){
+	useEffect(() => {
+		const canVibrate = ('vibrate' in navigator)
+		if (!canVibrate) return
+		if (state.endGame === 'WIN' || state.endGame === 'LOSE') {
 			navigator.vibrate(200)
 		}
-	},[state.endGame])
+	}, [state.endGame])
 
 	return (
 		<MinesweeperProvider>
