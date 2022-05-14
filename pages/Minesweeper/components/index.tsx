@@ -1,22 +1,28 @@
 import { GameLevel } from 'games/MinesweeperGame';
 import styled from 'styled-components';
 
+const Container = styled.div`
+	display: flex;
+    flex-flow: column;
+    align-items: center;
+`
+export default Container
+
 const boardSize = {
 	[GameLevel.Easy]: { maxWidth: "437px" },
 	[GameLevel.Medium]: { maxWidth: "772px" },
 	[GameLevel.Hard]: { maxWidth: "1157px" },
 	[GameLevel.Impossible]: { maxWidth: "1266px" },
 }
-const Board = styled.div<{ level: GameLevel }>`
+export const Board = styled.div<{ level: GameLevel }>`
 	width: 100%;
 	max-width: ${p => boardSize[p.level === undefined ? GameLevel.Easy : p.level].maxWidth};
 `
-export default Board
 
 export const LevelRow = styled.div`
 	margin: 5px 0;
 	width: 100%;
-	max-width: 500px;
+	max-width: 437px;
 	display: flex;
 	flex-flow: row wrap;
 	justify-content: center;
@@ -33,9 +39,10 @@ export const LevelButton = styled.button<{ isActive: boolean }>`
 `
 
 export const TopBar = styled.div`
+	background-color: whitesmoke;
 	width: 100%;
     height: 60px;
-	max-width: 500px;
+	max-width: 437px;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	align-items: center;
@@ -61,6 +68,7 @@ export const Grid = styled.div<{ disabled: boolean }>`
     border-color: lightgray;
 	opacity: ${p => p.disabled ? 0.8 : 1};
 `
+
 export const Row = styled.div`
 	display: -webkit-box;
 `

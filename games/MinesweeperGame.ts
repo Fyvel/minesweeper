@@ -130,12 +130,14 @@ export default function MinesweeperReducer(state: MinesweeperState, action: Acti
 			return revealArea(state, action.payload)
 		case 'FLAG_AREA':
 			const currentCell = state.board[action.payload.x][action.payload.y]
+			const isFlagged = currentCell.isFlagged
+            console.log(" LOG:  >  MinesweeperReducer  >  isFlagged", isFlagged)
 			const newBoard = [...state.board]
 			newBoard[action.payload.x][action.payload.y] = { isVisible: false, isFlagged: !currentCell.isFlagged }
 			return {
 				...state,
 				board: newBoard,
-				minesCount: currentCell.isFlagged ? state.minesCount + 1 : state.minesCount - 1,
+				minesCount: isFlagged ? state.minesCount + 1 : state.minesCount - 1,
 			}
 		default:
 			return state

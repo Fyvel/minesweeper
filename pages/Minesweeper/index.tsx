@@ -1,8 +1,9 @@
 import { MinesweeperState } from 'games/MinesweeperGame'
 import MinesweeperProvider, { useMinesweeperHook } from 'context/MinesweeperProvider'
 import { formatTime } from '@/utils/formatTime'
-import Board, { Area, Button, Grid, Row, TopBar } from './components'
+import Container, { Board, Area, Button, Grid, Row, TopBar } from './components'
 import LevelSelector from "./components/LevelSelector"
+import { useEffect } from 'react'
 
 export default function Minesweeper() {
 	const { state, timer, actions } = useMinesweeperHook()
@@ -14,45 +15,55 @@ export default function Minesweeper() {
 		actions.flagArea({ x: xIndex, y: yIndex })
 	}
 
+	useEffect(()=>{
+		if(state.endGame === 'WIN'|| state.endGame === 'LOSE'){
+			navigator.vibrate(200)
+		}
+	},[state.endGame])
+
 	return (
 		<MinesweeperProvider>
-			<TopBar>
-				{state.minesCount}
-				<Button onClick={() => actions.newGame(state.level)}>{getFace(state.endGame)}</Button>
-				{formatTime(timer.value)}
-			</TopBar>
-			<Board level={state.level}>
-				<Grid disabled={!!state.endedOn}>
-					{!!state.board?.length && state.board.map((row, xIndex) => (
-						<Row key={xIndex}>
-							{row.map(({ isVisible, isFlagged, value }, yIndex) => (
-								<Area
-									key={`${xIndex}_${yIndex}`}
-									aria-label="minefield area"
-									onClick={(e) => {
-										e.preventDefault()
-										onClickCell(xIndex, yIndex)
-									}}
-									onContextMenu={(e) => {
-										e.preventDefault()
-										onContextClickCell(xIndex, yIndex)
-									}}
-									isVisible={isVisible}
-									level={state.level}
-								>
-									{!!isVisible && (value === undefined
-										? '💣'
-										: value === 0
-											? ''
-											: `${value}`)}
-									{!!isFlagged && '🚩'}
-								</Area>
-							))}
-						</Row>
-					))}
-				</Grid>
-			</Board>
-			<LevelSelector onSelect={actions.newGame} />
+			<Container>
+				<TopBar>
+					{state.minesCount}
+					<Button onClick={() => actions.newGame(state.level)}>{getFace(state.endGame)}</Button>
+					{formatTime(timer.value)}
+				</TopBar>
+				<Board level={state.level}>
+					<Grid disabled={!!state.endedOn}>
+						{!!state.board?.length && state.board.map((row, xIndex) => (
+							<Row key={xIndex}>
+								{row.map(({ isVisible, isFlagged, value }, yIndex) => (
+									<Area
+										key={`${xIndex}_${yIndex}`}
+										aria-label="minefield area"
+										onClick={(e) => {
+											e.preventDefault()
+											e.stopPropagation()
+											onClickCell(xIndex, yIndex)
+										}}
+										onContextMenu={(e) => {
+											e.preventDefault()
+											e.stopPropagation()
+											onContextClickCell(xIndex, yIndex)
+										}}
+										isVisible={isVisible}
+										level={state.level}
+									>
+										{!!isVisible && (value === undefined
+											? '💣'
+											: value === 0
+												? ''
+												: `${value}`)}
+										{!!isFlagged && '🚩'}
+									</Area>
+								))}
+							</Row>
+						))}
+					</Grid>
+				</Board>
+				<LevelSelector onSelect={actions.newGame} />
+			</Container>
 		</MinesweeperProvider>
 	)
 }

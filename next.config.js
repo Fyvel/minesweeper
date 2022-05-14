@@ -8,4 +8,8 @@ module.exports = withPWA({
 		skipWaiting: true,
 		runtimeCaching,
 	},
+	reactStrictMode: true,
+	compiler: {
+		styledComponents: true,
+	},
 })
