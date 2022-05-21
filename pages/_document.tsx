@@ -3,8 +3,6 @@ import Document, {
 	NextScript, DocumentContext, DocumentInitialProps
 } from "next/document";
 import { ServerStyleSheet } from "styled-components";
-import Footer from "./Footer";
-import Header from "./Header";
 
 export default class MyDocument extends Document {
 	static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
@@ -48,16 +46,8 @@ export default class MyDocument extends Document {
 					<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
 				</Head>
 				<body>
-					<header className="header">
-						<Header />
-					</header>
-					<main className="main">
-						<Main />
-						<NextScript />
-					</main>
-					<footer className="footer">
-						<Footer />
-					</footer>
+					<Main />
+					<NextScript />
 				</body>
 			</Html>
 		);

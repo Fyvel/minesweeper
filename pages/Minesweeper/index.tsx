@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react'
 import { MinesweeperState } from 'games/MinesweeperGame'
 import MinesweeperProvider, { useMinesweeperHook } from 'context/MinesweeperProvider'
 import { formatTime } from '@/utils/formatTime'
-import Container, { Board, Area, Button, Grid, Row, TopBar } from './components'
-import LevelSelector from "./components/LevelSelector"
-import { useEffect } from 'react'
+import Container, { TopBar, Button, Board, Grid, Row, Area } from './components'
+import LevelSelector from './components/LevelSelector'
+import LoadingScreen from './components/LoadingScreen'
 
 export default function Minesweeper() {
 	const { state, timer, actions } = useMinesweeperHook()
@@ -28,7 +29,9 @@ export default function Minesweeper() {
 			<Container>
 				<TopBar>
 					{state.minesCount}
-					<Button onClick={() => actions.newGame(state.level)}>{getFace(state.endGame)}</Button>
+					<Button onClick={() => actions.newGame(state.level)}>
+						{getFace(state.endGame)}
+					</Button>
 					{formatTime(timer.value)}
 				</TopBar>
 				<Board level={state.level}>

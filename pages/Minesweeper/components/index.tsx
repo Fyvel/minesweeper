@@ -39,7 +39,6 @@ export const LevelButton = styled.button<{ isActive: boolean }>`
 `
 
 export const TopBar = styled.div`
-	background-color: whitesmoke;
 	width: 100%;
     height: 60px;
 	max-width: 437px;

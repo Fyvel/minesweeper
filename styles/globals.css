@@ -1,7 +1,5 @@
 html {
     scroll-behavior: smooth;
-    max-width: 100vw;
-    height: 100%;
 }
 
 ::-webkit-scrollbar {
@@ -14,50 +12,10 @@ html {
 }
 
 body {
-    margin: 0;
-	background-color: #545454;
+	max-width: 100vw;
+    height: 100%;
     font-family: 'Press Start 2P', -apple-system, Fira Sans, Helvetica Neue, sans-serif;
+    margin: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
-    grid-template-areas:
-        'header'
-        'main'
-        'footer';
-}
-
-.header {
-    grid-area: header;
-	background-color: white;
-    width: 100%;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-	font-weight: bold;
-}
-
-.main {
-    grid-area: main;
-    width: 100%;
-}
-
-.footer {
-    grid-area: footer;
-	background-color: white;
-    width: 100%;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: -apple-system, Fira Sans, Helvetica Neue, sans-serif;
-    grid-row-start: 3;
-    grid-row-end: 4;
-}
-
-.footer a {
-    color: inherit;
-    text-decoration: none;
 }
