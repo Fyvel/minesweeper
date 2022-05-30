@@ -1,7 +1,7 @@
 
 type ActionBase<K, V = void> = V extends void ? { type: K } : { type: K } & V
 type AreaType = { x: number, y: number }
-type Action =
+export type Action =
 	| ActionBase<'NEW_GAME', { payload: GameLevel }>
 	| ActionBase<'REVEAL_AREA', { payload: AreaType }>
 	| ActionBase<'FLAG_AREA', { payload: AreaType }>
@@ -23,10 +23,10 @@ export type MinesweeperState = {
 	moves: { x: number, y: number }[],
 	minesCount: number,
 	flagsCount: number,
-	endGame: 'WIN' | 'LOSE' | 'PLAYING',
 	grid: boolean[][],
 	minefield: boolean[][],
 	startedOn?: number,
+	endGame: 'WIN' | 'LOSE' | 'PLAYING',
 	endedOn?: number,
 }
 
@@ -36,7 +36,7 @@ export type MinesweeperActions = {
 	flagArea: ({ x, y }: { x: number, y: number }) => MinesweeperState,
 }
 
-export const nbOfMines = {
+export const NbOfMines = {
 	[GameLevel.Easy]: 10,
 	[GameLevel.Medium]: 40,
 	[GameLevel.Hard]: 80,
@@ -44,109 +44,206 @@ export const nbOfMines = {
 }
 
 export default function MinesweeperReducer(state: MinesweeperState, action: Action): MinesweeperState {
-
 	switch (action.type) {
 		case 'NEW_GAME':
-			const grid = _createGrid(action.payload)
-			// Mines layer
-			const minefield = _placeMines(action.payload, grid);
-			// Discovery layer
-			const board = _createFog(grid)
-
-			return {
-				...state,
-				level: action.payload,
-				minesCount: nbOfMines[action.payload],
-				flagsCount: 0,
-				moves: [] as { x: number, y: number }[],
-				endGame: 'PLAYING',
-				grid,
-				minefield,
-				board,
-				startedOn: new Date().getMilliseconds(),
-				endedOn: undefined,
-			}
+			return { ...NewGame(state, action.payload) }
 		case 'REVEAL_AREA':
-			const revealArea = (current: MinesweeperState, { x, y }: { x: number, y: number }): MinesweeperState => {
-				if (current.board[x]?.[y] === undefined || current.board[x]?.[y]?.isVisible)
-					return { ...current }
-
-				if (current.minefield[x][y]) {
-					const newBoard = [...state.board]
-						.map((row, yIndex) => {
-							return row.map((_, xIndex) => {
-								const newArea = {
-									isFlagged: false,
-									isVisible: true,
-									value: current.minefield[yIndex][xIndex]
-										? undefined
-										: _getNeighbors(current.minefield, { x: yIndex, y: xIndex })
-								}
-								return newArea
-							})
-						})
-					return {
-						...current,
-						moves: [...current.moves, { x, y }],
-						minesCount: current.minesCount - 1,
-						board: newBoard,
-						endGame: 'LOSE',
-						endedOn: new Date().getMilliseconds(),
-					}
-				}
-
-				const minesNearby = _getNeighbors(current.minefield, { x, y })
-				const newBoard = [...current.board]
-				newBoard[x][y] = { isVisible: true, isFlagged: false, value: minesNearby }
-				if (minesNearby === 0) {
-					if (!current.board[x - 1]?.[y - 1]?.isVisible) revealArea(current, { x: x - 1, y: y - 1 })
-					if (!current.board[x - 1]?.[y]?.isVisible) revealArea(current, { x: x - 1, y })
-					if (!current.board[x - 1]?.[y + 1]?.isVisible) revealArea(current, { x: x - 1, y: y + 1 })
-					if (!current.board[x]?.[y - 1]?.isVisible) revealArea(current, { x, y: y - 1 })
-					if (!current.board[x]?.[y + 1]?.isVisible) revealArea(current, { x, y: y + 1 })
-					if (!current.board[x + 1]?.[y - 1]?.isVisible) revealArea(current, { x: x + 1, y: y - 1 })
-					if (!current.board[x + 1]?.[y]?.isVisible) revealArea(current, { x: x + 1, y: y })
-					if (!current.board[x + 1]?.[y + 1]?.isVisible) revealArea(current, { x: x + 1, y: y + 1 })
-				}
-
-				const remainingAreas = _getRemainingAreas(newBoard, state.minefield)
-				if (!remainingAreas.length) {
-					return {
-						...current,
-						moves: [...current.moves, { x, y }],
-						minesCount: current.minesCount - 1,
-						board: newBoard,
-						endGame: 'WIN',
-						endedOn: new Date().getMilliseconds(),
-					}
-				}
-
-				return {
-					...current,
-					moves: [...current.moves, { x, y }],
-					board: newBoard,
-				}
-			}
-			return revealArea(state, action.payload)
+			return { ...RevealArea(state, action.payload) }
 		case 'FLAG_AREA':
-			const currentCell = state.board[action.payload.x][action.payload.y]
-			const isFlagged = currentCell.isFlagged
-            console.log(" LOG:  >  MinesweeperReducer  >  isFlagged", isFlagged)
-			const newBoard = [...state.board]
-			newBoard[action.payload.x][action.payload.y] = { isVisible: false, isFlagged: !currentCell.isFlagged }
-			return {
-				...state,
-				board: newBoard,
-				minesCount: isFlagged ? state.minesCount + 1 : state.minesCount - 1,
-			}
+			return { ...FlagArea(state, action.payload) }
 		default:
-			return state
+			return { ...state }
 	}
 }
 
-export const initialise = (level: GameLevel) => _createFog(_createGrid(level))
+export const Initialise = (level: GameLevel) => createFog(createGrid(level))
 
-const _createGrid = (level: GameLevel): boolean[][] => {
+//#region FlagArea
+function FlagArea(state: MinesweeperState, payload: AreaType) {
+	const currentCell = { ...state.board[payload.x][payload.y] }
+	const isFlagged = currentCell.isFlagged
+	const boardFlagged = [...state.board]
+	boardFlagged[payload.x][payload.y] = {
+		...boardFlagged[payload.x][payload.y],
+		isVisible: false,
+		isFlagged: !currentCell.isFlagged
+	}
+	return {
+		...state,
+		board: boardFlagged,
+		minesCount: isFlagged ? state.minesCount + 1 : state.minesCount - 1,
+	}
+}
+//#endregion
+
+//#region RevealArea
+function RevealArea(state: MinesweeperState, payload: AreaType) {
+	const boardRevealed = revealArea({ ...state }, payload)
+	const newEndGame = calculateEndGame({
+		board: boardRevealed,
+		minefield: [...state.minefield]
+	}, payload)
+	const newMoves = addMove([...state.moves], payload)
+	const newMinesCount = updateMinesCount({ ...state }, payload)
+	return {
+		...state,
+		board: boardRevealed,
+		moves: newMoves,
+		minesCount: newMinesCount,
+		...newEndGame
+	}
+}
+
+const revealArea = (state: MinesweeperState, { x, y }: { x: number, y: number }): MinesweeperState['board'] => {
+	const isAlreadyRevealed = state.board[x]?.[y] === undefined
+		|| state.board[x]?.[y]?.isVisible
+	if (isAlreadyRevealed)
+		return [...state.board]
+
+	const isMined = state.minefield[x][y]
+	if (isMined) {
+		const res = revealBoard(state)
+		return res
+	}
+
+	let boardRevealed = [...state.board]
+	const minesNearby = getNeighbors(state.minefield, { x, y })
+	boardRevealed[x][y] = { isVisible: true, isFlagged: false, value: minesNearby }
+	if (minesNearby === 0) {
+		if (isNeighborVisible(state, x - 1, y - 1))
+			boardRevealed = revealArea(state, { x: x - 1, y: y - 1 })
+		if (isNeighborVisible(state, x - 1, y))
+			boardRevealed = revealArea(state, { x: x - 1, y })
+		if (isNeighborVisible(state, x - 1, y + 1))
+			boardRevealed = revealArea(state, { x: x - 1, y: y + 1 })
+		if (isNeighborVisible(state, x, y - 1))
+			boardRevealed = revealArea(state, { x, y: y - 1 })
+		if (isNeighborVisible(state, x, y + 1))
+			boardRevealed = revealArea(state, { x, y: y + 1 })
+		if (isNeighborVisible(state, x + 1, y - 1))
+			boardRevealed = revealArea(state, { x: x + 1, y: y - 1 })
+		if (isNeighborVisible(state, x + 1, y))
+			boardRevealed = revealArea(state, { x: x + 1, y: y })
+		if (isNeighborVisible(state, x + 1, y + 1))
+			boardRevealed = revealArea(state, { x: x + 1, y: y + 1 })
+	}
+	return boardRevealed
+}
+const revealBoard = (currentState: MinesweeperState): MinesweeperState['board'] => {
+	const revealed = currentState.board.map((row, yIndex) => {
+		return row.map((_, xIndex) => ({
+			isFlagged: false,
+			isVisible: true,
+			value: currentState.minefield[yIndex][xIndex]
+				? undefined
+				: getNeighbors(currentState.minefield, { x: yIndex, y: xIndex })
+		}))
+	})
+	return [...revealed]
+}
+const isNeighborVisible = (state: MinesweeperState, x: number, y: number) => !state.board[x]?.[y]?.isVisible
+
+const calculateEndGame = ({ board, minefield }: Pick<MinesweeperState, 'board' | 'minefield'>, payload: AreaType): {
+	endGame: 'WIN' | 'LOSE' | 'PLAYING',
+	endedOn?: number,
+} => {
+	const isMined = minefield[payload.x][payload.y]
+	if (isMined) {
+		return {
+			endGame: 'LOSE',
+			endedOn: new Date().getMilliseconds(),
+		}
+	}
+	const remainingAreas = getRemainingAreas(board, minefield)
+	if (!remainingAreas.length) {
+		return {
+			endGame: 'WIN',
+			endedOn: new Date().getMilliseconds(),
+		}
+	}
+	return {
+		endGame: 'PLAYING',
+		endedOn: undefined,
+	}
+}
+const getRemainingAreas = (
+	board: { isVisible: boolean; isFlagged: boolean; value?: number }[][],
+	minefield: boolean[][]): { x: Number, y: number }[] => {
+	const locations = board
+		.reduce((acc, curr, yIndex) => {
+			curr.forEach((area, xIndex) => {
+				if (area.isVisible || minefield[yIndex][xIndex]) return
+				acc.push({ y: yIndex, x: xIndex })
+			})
+			return acc
+		}, [] as { x: Number, y: number }[])
+	return locations
+}
+
+
+const addMove = (moves: { x: number; y: number }[], payload: AreaType) => [
+	...moves,
+	{ ...payload }
+]
+
+const updateMinesCount = (state: MinesweeperState, payload: AreaType): number => {
+	const isMined = state.minefield[payload.x][payload.y]
+	return state.minesCount - (isMined ? 1 : 0)
+}
+
+//#endregion
+
+//#region NewGame
+function NewGame(state: MinesweeperState, payload: GameLevel): MinesweeperState {
+	const grid = createGrid(payload)
+	// Mines layer
+	const minefield = placeMines(payload, grid)
+	// Discovery layer
+	const board = createFog(grid)
+
+	return {
+		...state,
+		level: payload,
+		minesCount: NbOfMines[payload],
+		flagsCount: 0,
+		moves: [] as { x: number; y: number }[],
+		endGame: 'PLAYING',
+		grid,
+		minefield,
+		board,
+		startedOn: new Date().getMilliseconds(),
+		endedOn: undefined,
+	}
+}
+
+const placeMines = (level: GameLevel, field: boolean[][]): boolean[][] => {
+	const locations = field
+		.reduce((acc, curr, yIndex) => {
+			curr.forEach((_, xIndex) => { acc.push({ y: yIndex, x: xIndex }) })
+			return acc
+		}, [] as { x: Number, y: number }[])
+		.sort(() => 0.5 - Math.random())
+		.slice(0, NbOfMines[level])
+	const minefield = field.map((row, yIdx) => row
+		.map((_, xIdx) => locations
+			.map(mine => `${mine.x}_${mine.y}`)
+			.includes(`${xIdx}_${yIdx}`)))
+	return minefield
+}
+//#endregion
+
+//#region Helpers
+const createFog = (field: boolean[][]) => {
+	const fog = field
+		.map(row => row
+			.map(_ => ({
+				isVisible: false,
+				isFlagged: false,
+				value: undefined
+			})))
+	return fog
+}
+const createGrid = (level: GameLevel): boolean[][] => {
 	switch (level) {
 		case GameLevel.Easy:
 			return Array(9).fill(Array(9).fill(false))
@@ -160,34 +257,7 @@ const _createGrid = (level: GameLevel): boolean[][] => {
 			throw new Error('Unknown level selected')
 	}
 }
-
-const _placeMines = (level: GameLevel, field: boolean[][]): boolean[][] => {
-	const locations = field
-		.reduce((acc, curr, yIndex) => {
-			curr.forEach((_, xIndex) => { acc.push({ y: yIndex, x: xIndex }) })
-			return acc
-		}, [] as { x: Number, y: number }[])
-		.sort(() => 0.5 - Math.random())
-		.slice(0, nbOfMines[level])
-	const minefield = field.map((row, yIdx) => row
-		.map((_, xIdx) => locations
-			.map(mine => `${mine.x}_${mine.y}`)
-			.includes(`${xIdx}_${yIdx}`)))
-	return minefield
-}
-
-const _createFog = (field: boolean[][]) => {
-	const fog = field
-		.map(row => row
-			.map(_ => ({
-				isVisible: false,
-				isFlagged: false,
-				value: undefined
-			})))
-	return fog
-}
-
-const _getNeighbors = (minefield: boolean[][], { x, y }: { x: number; y: number; }): number => {
+const getNeighbors = (minefield: boolean[][], { x, y }: { x: number; y: number; }): number => {
 	const count =
 		[
 			minefield[x - 1]?.[y - 1],
@@ -204,18 +274,5 @@ const _getNeighbors = (minefield: boolean[][], { x, y }: { x: number; y: number;
 		}, 0)
 	return count
 }
-
-const _getRemainingAreas = (
-	board: { isVisible: boolean; isFlagged: boolean; value?: number }[][],
-	minefield: boolean[][]): { x: Number, y: number }[] => {
-	const locations = board
-		.reduce((acc, curr, yIndex) => {
-			curr.forEach((area, xIndex) => {
-				if (area.isVisible || minefield[yIndex][xIndex]) return
-				acc.push({ y: yIndex, x: xIndex })
-			})
-			return acc
-		}, [] as { x: Number, y: number }[])
-	return locations
-}
+//#endregion
 
