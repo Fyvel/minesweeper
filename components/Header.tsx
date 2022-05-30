@@ -2,6 +2,7 @@ import { useOnClickOutside } from "@/hooks/useClickOutside";
 import { useRef, useState } from "react";
 import styled from "styled-components";
 import Burger from "./Burger";
+import Icon from "./Icon";
 import Menu from "./Menu";
 
 export default function Header() {
@@ -14,7 +15,7 @@ export default function Header() {
 			<Head ref={node}>
 				<Burger open={open} setOpen={setOpen} />
 				Hello there!
-				<Burger open={open} setOpen={setOpen} />
+				<Icon variant="primary">workspace_premium</Icon>
 			</Head>
 			<Menu open={open} />
 		</>

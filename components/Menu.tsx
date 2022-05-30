@@ -54,6 +54,7 @@ const StyledMenu = styled.nav<{ open: boolean }>`
 
 		@media (max-width: ${({ theme }) => theme.mobile}) {
 			font-size: 1.2em;
+			letter-spacing: 0.2rem;
 			text-align: center;
 		}
 	}
